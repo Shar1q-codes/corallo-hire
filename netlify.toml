@@ -1,0 +1,6 @@
+[build]
+  command = "turbo run build --filter @corallo/web"
+  publish = "apps/web/.next"
+
+[build.environment]
+  NODE_VERSION = "20"
