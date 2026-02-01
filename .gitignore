@@ -1,0 +1,38 @@
+# Node
+node_modules/
+.pnp/
+.pnp.js
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Turbo / Next
+.turbo/
+apps/web/.next/
+
+# Build output
+**/dist/
+**/build/
+
+# Env
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Prisma
+**/.prisma/
+
+# Coverage
+coverage/
+
+# IDE
+.vscode/
+.idea/

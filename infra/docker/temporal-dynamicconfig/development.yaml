@@ -1,0 +1,4 @@
+# Minimal Temporal dynamic config for dev
+frontend.enableUpdateWorkflowExecution:
+  - value: true
+    constraints: {}

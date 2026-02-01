@@ -1,0 +1,29 @@
+{
+  "name": "@corallo/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "eslint . --ext .ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test --import tsx",
+    "prisma": "prisma",
+    "seed": "tsx src/seed.ts",
+    "postinstall": "prisma generate"
+  },
+  "prisma": {
+    "seed": "tsx src/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "@temporalio/client": "^1.11.3"
+  },
+  "devDependencies": {
+    "prisma": "^5.22.0",
+    "tsx": "^4.7.0"
+  }
+}
+

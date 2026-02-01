@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  RECRUITER
+  CANDIDATE
+}
+
+enum JobStatus {
+  DRAFT
+  OPEN
+  CLOSED
+}
+
+enum ApplicationStatus {
+  APPLIED
+  IN_REVIEW
+  REJECTED
+  HIRED
+}
+
+enum OutboxStatus {
+  PENDING
+  DISPATCHED
+  FAILED
+}
+
+model Tenant {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  users         User[]
+  candidates    Candidate[]
+  jobs          Job[]
+  applications  Application[]
+  events        ApplicationEvent[]
+  scores        Score[]
+  explanations  Explanation[]
+  outbox        Outbox[]
+
+  @@index([id])
+}
+
+model User {
+  id        String   @id @default(uuid())
+  tenantId  String
+  email     String
+  role      UserRole
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@unique([tenantId, email])
+}
+
+model Candidate {
+  id        String   @id @default(uuid())
+  tenantId  String
+  email     String
+  fullName  String
+  phone     String?
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  applications Application[]
+
+  @@index([tenantId])
+  @@unique([tenantId, email])
+}
+
+model Job {
+  id          String    @id @default(uuid())
+  tenantId    String
+  title       String
+  location    String?
+  description String
+  status      JobStatus @default(DRAFT)
+  createdAt   DateTime  @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  applications Application[]
+
+  @@index([tenantId])
+}
+
+model Application {
+  id          String             @id @default(uuid())
+  tenantId    String
+  candidateId String
+  jobId       String
+  status      ApplicationStatus  @default(APPLIED)
+  createdAt   DateTime           @default(now())
+
+  tenant     Tenant    @relation(fields: [tenantId], references: [id])
+  candidate  Candidate @relation(fields: [candidateId], references: [id])
+  job        Job       @relation(fields: [jobId], references: [id])
+  events     ApplicationEvent[]
+  scores     Score[]
+  explanations Explanation[]
+
+  @@index([tenantId])
+  @@unique([tenantId, candidateId, jobId])
+}
+
+model ApplicationEvent {
+  id            String   @id @default(uuid())
+  tenantId      String
+  applicationId String
+  type          String
+  payloadJson   Json
+  createdAt     DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  application Application @relation(fields: [applicationId], references: [id])
+
+  @@index([tenantId])
+  @@index([applicationId])
+}
+
+model Score {
+  id            String   @id @default(uuid())
+  tenantId      String
+  applicationId String
+  modelVersion  String
+  score         Int
+  createdAt     DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  application Application @relation(fields: [applicationId], references: [id])
+
+  @@index([tenantId])
+}
+
+model Explanation {
+  id            String   @id @default(uuid())
+  tenantId      String
+  applicationId String
+  reason        String
+  suggestionsJson Json
+  createdAt     DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  application Application @relation(fields: [applicationId], references: [id])
+
+  @@index([tenantId])
+}
+
+model Outbox {
+  id             String       @id @default(uuid())
+  tenantId       String
+  type           String
+  payloadJson    Json
+  status         OutboxStatus @default(PENDING)
+  idempotencyKey String
+  attempts       Int          @default(0)
+  nextRunAt      DateTime     @default(now())
+  createdAt      DateTime     @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([status, nextRunAt])
+  @@unique([idempotencyKey])
+}

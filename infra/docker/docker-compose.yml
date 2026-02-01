@@ -1,0 +1,49 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16
+    container_name: corallo_postgres
+    environment:
+      POSTGRES_USER: corallo
+      POSTGRES_PASSWORD: corallo
+      POSTGRES_DB: corallo
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  temporal:
+    build:
+      context: ./temporal
+    image: corallo-temporal:dev
+    container_name: corallo_temporal
+    depends_on:
+      - postgres
+    environment:
+      DB: postgres12
+      DB_PORT: "5432"
+      POSTGRES_SEEDS: corallo_postgres
+      POSTGRES_USER: corallo
+      POSTGRES_PWD: corallo
+      POSTGRES_PASSWORD: corallo
+      POSTGRES_DB: corallo
+      DYNAMIC_CONFIG_FILE_PATH: config/dynamicconfig/development.yaml
+    ports:
+      - "7233:7233"
+    volumes:
+      - ./temporal-dynamicconfig:/etc/temporal/config/dynamicconfig
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 7233"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  temporal-ui:
+    image: temporalio/ui:2.27.0
+    container_name: corallo_temporal_ui
+    depends_on:
+      - temporal
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+    ports:
+      - "8233:8080"
+volumes:
+  postgres_data:
