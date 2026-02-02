@@ -10,12 +10,20 @@ export default function LandingPage() {
             <Link href="#features">Features</Link>
             <Link href="#security">Security</Link>
             <Link href="#pricing">Pricing</Link>
-            <Link
-              href="/login"
-              className="rounded-full border border-white/40 px-4 py-2 text-white hover:bg-white/10"
-            >
-              Sign in
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/login"
+                className="rounded-full border border-white/40 px-4 py-2 text-white hover:bg-white/10"
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/signup"
+                className="rounded-full bg-white px-4 py-2 text-slate-900 hover:bg-white/90"
+              >
+                Sign up
+              </Link>
+            </div>
           </div>
         </header>
 
@@ -35,6 +43,12 @@ export default function LandingPage() {
                 className="rounded-full bg-orange-400 px-6 py-3 text-sm font-semibold text-slate-900"
               >
                 Sign in
+              </Link>
+              <Link
+                href="/signup"
+                className="rounded-full border border-white/40 px-6 py-3 text-sm font-semibold text-white"
+              >
+                Sign up
               </Link>
               <Link
                 href="/login"
